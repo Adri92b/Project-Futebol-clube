@@ -1,0 +1,110 @@
+ 
+app/backend/Dockerfile*****************************8
+
+FROM node:16-alpine
+WORKDIR /backend
+COPY package*.json ./
+RUN npm install
+COPY . .
+EXPOSE 3001
+CMD ["npm", "start"] 
+
+
+ 
+app/backend/package.json ***********************************************
+
+  "main": "./build/server",
+  "scripts": {
+    "build": "/bin/sh tsc_eval.sh",
+    "test": "mocha -r ts-node/register ./src/tests/*$NAME*.{test,spec}.ts -t 10000 --exit",
+    "test": "mocha -r ts-node/register ./src/tests/*.{test,spec}.ts -t 10000 --exit",
+    "test:coverage": "nyc npm run test",
+    "test:coverage:json": "nyc --reporter=json-summary npm run test",
+    "db:reset": "npx sequelize-cli db:drop && npx sequelize-cli db:create && npx sequelize-cli db:migrate && npx sequelize-cli db:seed:all",
+@@ -22,7 +22,7 @@
+  "devDependencies": {
+    "@istanbuljs/nyc-config-typescript": "1.0.2",
+    "@types/chai": "4.3.0",
+    "@types/chai-http": "4.2.0",
+    "@types/chai-http": "^4.2.0",
+    "@types/cors": "2.8.12",
+    "@types/express": "4.17.13",
+    "@types/jsonwebtoken": "8.5.6",
+@@ -51,12 +51,19 @@
+    "typescript": "4.4.4"
+  },
+  "dependencies": {
+    "@types/bcrypt": "^5.0.0",
+    "@types/bcryptjs": "^2.4.2",
+    "@types/shelljs": "^0.8.11",
+    "bcrypt": "^5.0.1",
+    "bcryptjs": "^2.4.3",
+    "cors": "2.8.5",
+    "dotenv": "10.0.0",
+    "express": "4.17.1",
+    "jest": "27.4.3",
+    "joi": "^17.6.0",
+    "jsonwebtoken": "8.5.1",
+    "mysql2": "2.3.3",
+    "sequelize": "6.9.0"
+    "sequelize": "6.9.0",
+    "shelljs": "^0.8.5"
+  }
+}
+
+
+app/backend/packages.npm ******************88
+
+bcryptjs
+@types/bcryptjs
+@types/chai-http
+
+
+
+
+ 
+app/backend/src/app.ts *****************
+
+import * as express from 'express';
+import LeaderboardRouter from './routes/leaderboard';
+import LoginRouter from './routes/login';
+import MatchesRouter from './routes/matches';
+import TeamsRouter from './routes/teams';
+
+class App {
+  public app: express.Express;
+  // ...
+
+  constructor() {
+    // ...
+    this.app = express();
+    this.config();
+    this.routes();
+    // ...
+  }
+
+@@ -19,12 +24,20 @@ class App {
+    };
+
+    this.app.use(accessControl);
+    this.app.use(express.json());
+    // ...
+  }
+
+  private routes(): void {
+    this.app.use('/login', LoginRouter);
+    this.app.use('/teams', TeamsRouter);
+    this.app.use('/matches', MatchesRouter);
+    this.app.use('/leaderboard', LeaderboardRouter);
+  }
+
+  // ...
+  public start(PORT: string | number):void {
+    // ...
+    this.app.listen(PORT, () => console.log(`⚽ on 🥅 : ${PORT}`));
+  }
+}
+
+
+
+

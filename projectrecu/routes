@@ -1,0 +1,74 @@
+app/backend/src/routes/leaderboard.ts ***************
+
+import { Router } from 'express';
+import LeaderboardController from '../controllers/leaderboard';
+
+const LeaderboardRouter = Router();
+
+const controllers = new LeaderboardController();
+
+LeaderboardRouter.get('/home', controllers.getHomeLeaderboard);
+
+export default LeaderboardRouter;
+
+
+app/backend/src/routes/login.ts *****************
+
+import { Router } from 'express';
+import { validatePassword, validateEmail } from '../middlewares/login';
+import LoginController from '../controllers/login';
+
+const LoginRouter = Router();
+
+const controllers = new LoginController();
+
+const validateLogin = [
+  validateEmail,
+  validatePassword,
+];
+
+LoginRouter.post('/', validateLogin, controllers.login);
+LoginRouter.get('/validate', controllers.validateLogin);
+
+export default LoginRouter;
+
+
+app/backend/src/routes/matches.ts *************************
+
+import { Router } from 'express';
+import { validateInProgress } from '../middlewares/matches';
+import { validateTeams } from '../middlewares/matches';
+import MatchesController from '../controllers/matches';
+
+const MatchesRouter = Router();
+
+const controllers = new MatchesController();
+
+const validateCreateInProgressMatches = [
+  validateTeams,
+  validateInProgress,
+];
+
+MatchesRouter.get('/', controllers.getMatches);
+MatchesRouter.post('/', validateCreateInProgressMatches, controllers.create);
+MatchesRouter.patch('/:id/finish', controllers.finishMatch);
+MatchesRouter.patch('/:id', controllers.editMatch);
+
+export default MatchesRouter;
+
+
+
+app/backend/src/routes/teams.ts **********************************
+
+import { Router } from 'express';
+import TeamsController from '../controllers/teams';
+
+const TeamsRouter = Router();
+
+const controllers = new TeamsController();
+
+TeamsRouter.get('/', controllers.getTeams);
+TeamsRouter.get('/:id', controllers.getTeamById);
+
+export default TeamsRouter;
+

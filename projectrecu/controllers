@@ -1,0 +1,167 @@
+app/backend/src/controllers/leaderboard.ts ****************************
+
+import { Request, Response, NextFunction } from 'express';
+import Leaderboard from '../services/leaderboard';
+
+export default class LeaderboardController {
+  public getHomeLeaderboard = async (_req: Request, res: Response, next: NextFunction) => {
+    try {
+      const leaderboard = await Leaderboard.getHome();
+
+      return res.status(200).json(leaderboard);
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  };
+}
+
+ 
+app/backend/src/controllers/login.ts *********************************
+
+import { Request, Response, NextFunction } from 'express';
+import jwt from '../helpers/jwt';
+import Login from '../services/login';
+
+export default class LoginController {
+  public login = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { email, password } = req.body;
+      const signIn = await Login.login(email, password);
+
+      if (signIn === false) {
+        return res.status(401).json({ message: 'Incorrect email or password' });
+      }
+
+      if (signIn === null || signIn === undefined) {
+        return res.status(404).json({ message: 'Email not registered' });
+      }
+
+      return res.status(200).json(signIn);
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  };
+
+  public validateLogin = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { authorization } = req.headers;
+
+      if (!authorization) {
+        return res.status(400).json({ message: 'Invalid Token' });
+      }
+
+      const decryptedToken = await jwt.decryptToken(authorization);
+
+      return res.status(200).json(decryptedToken.role);
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  };
+}
+
+
+
+
+ 
+app/backend/src/controllers/matches.ts ****************************
+
+import { Request, Response, NextFunction } from 'express';
+import MatchesClass from '../services/matches';
+
+export default class MatchesController {
+  public getMatches = async (_req: Request, res: Response, next: NextFunction) => {
+    try {
+      const allMatches = await MatchesClass.getMatches();
+
+      return res.status(200).json(allMatches);
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  };
+
+  public create = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const {
+        homeTeam,
+        awayTeam,
+        homeTeamGoals,
+        awayTeamGoals,
+        inProgress
+      } = req.body;
+
+      const newMatch = await MatchesClass.createMatch({
+        homeTeam,
+        awayTeam,
+        homeTeamGoals,
+        awayTeamGoals,
+        inProgress
+      });
+
+      return res.status(201).json(newMatch);
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  };
+
+  public finishMatch = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { id } = req.params;
+      await MatchesClass.finishMatch(Number(id));
+      return res.status(200).json({
+        message: 'Match was finished',
+      });
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  };
+
+  public editMatch = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { id } = req.params;
+      const { homeTeamGoals, awayTeamGoals } = req.body;
+      await MatchesClass.editMatch(Number(id), homeTeamGoals, awayTeamGoals);
+      return res.status(200).json({
+        message: 'Match was edited',
+      });
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  };
+}
+
+
+app/backend/src/controllers/teams.ts ****************************
+
+import { Request, Response, NextFunction } from 'express';
+import TeamsClass from '../services/teams';
+
+export default class TeamsController {
+  public getTeams = async (_req: Request, res: Response, next: NextFunction) => {
+    try {
+      const allTeams = await TeamsClass.getTeams();
+
+      return res.status(200).json(allTeams);
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  };
+
+  public getTeamById = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { id } = req.params;
+      const team = await TeamsClass.getTeamById(Number(id));
+      return res.status(200).json(team);
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  };
+}

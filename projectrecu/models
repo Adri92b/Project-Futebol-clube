@@ -1,0 +1,160 @@
+ app/backend/src/database/models/Matches.tsimport { DataTypes, Model } from 'sequelize'; ********************
+
+
+import connection from '.';
+import Teams from './Teams';
+
+class Matches extends Model {
+  public readonly id: number;
+
+  public readonly homeTeam: string;
+
+  public readonly homeTeamGoals: number;
+
+  public readonly awayTeam: string;
+
+  public readonly awayTeamGoals: number;
+
+  public readonly inProgress: boolean;
+}
+
+Matches.init({
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+    allowNull: false,
+  },
+  homeTeam: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  homeTeamGoals: {
+    type: DataTypes.NUMBER,
+    allowNull: false,
+  },
+  awayTeam: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  awayTeamGoals: {
+    type: DataTypes.NUMBER,
+    allowNull: false,
+  },
+  inProgress: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+  },
+}, {
+  underscored: true,
+  sequelize: connection,
+  tableName: 'matches',
+  timestamps: false,
+});
+
+Matches.belongsTo(Teams, { foreignKey: 'homeTeam', as: 'teamHome' });
+Matches.belongsTo(Teams, { foreignKey: 'awayTeam', as: 'teamAway' });
+
+Teams.hasMany(Matches, { foreignKey: 'homeTeam', as: 'home_matches' });
+Teams.hasMany(Matches, { foreignKey: 'awayTeam', as: 'away_matches' });
+
+export default Matches;
+
+
+
+app/backend/src/database/models/Teams.ts *****************************
+
+import { DataTypes, Model } from 'sequelize';
+import connection from '.';
+
+class Teams extends Model {
+  public readonly id: number;
+
+  public readonly teamName: string;
+}
+
+Teams.init({
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+    allowNull: false,
+  },
+  teamName: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+}, {
+  underscored: true,
+  sequelize: connection,
+  tableName: 'teams',
+  timestamps: false,
+});
+
+export default Teams;
+
+
+ 
+app/backend/src/database/models/Users.ts ****************
+
+import { DataTypes, Model } from 'sequelize';
+import connection from '.';
+
+class Users extends Model {
+  public id: number;
+
+  public username: string;
+
+  public role: string;
+
+  public email: string;
+
+  public password: string;
+}
+
+Users.init({
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+    allowNull: false,
+  },
+  username: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  role: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  email: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  password: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+}, {
+  underscored: true,
+  sequelize: connection,
+  tableName: 'users',
+  timestamps: false,
+});
+
+export default Users;
+
+
+
+app/backend/src/database/models/index.ts **************************
+
+import { Sequelize } from 'sequelize';
+const dbConfig = require('../config/database');
+
+export default new Sequelize(dbConfig);
+
+export { default as Teams } from './Teams';
+export { default as Matches } from './Matches';
+export { default as Users } from './Users';
+
+

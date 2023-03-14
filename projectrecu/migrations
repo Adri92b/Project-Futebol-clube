@@ -1,0 +1,117 @@
+app/backend/src/database/migrations/20220502215549-create-teams.js ******************************
+
+'use strict';
+
+module.exports = {
+  up: async (queryInterface, Sequelize) => {
+    await queryInterface.createTable('teams', {
+      id: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+        allowNull: false,
+      },
+      team_name: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      }
+    })
+  },
+
+  down: async (queryInterface, Sequelize) => {
+    await queryInterface.dropTable('teams');
+  }
+};
+
+
+app/backend/src/database/migrations/20220502215603-create-users.js **************
+
+'use strict';
+
+module.exports = {
+  up: async (queryInterface, Sequelize) => {
+    await queryInterface.createTable('users', {
+      id: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+        allowNull: false
+      },
+      username: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      role: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      email: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      password: {
+        type: Sequelize.STRING,
+        allowNull: false
+      }
+   });
+  },
+
+  down: async (queryInterface, Sequelize) => {
+    await queryInterface.dropTable('users');
+  }
+};
+
+
+
+app/backend/src/database/migrations/20220502220940-create-matches.js *****************************
+
+'use strict';
+
+module.exports = {
+  up: async (queryInterface, Sequelize) => {
+    await queryInterface.createTable('matches', {
+      id: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+        allowNull: false
+      },
+      home_team: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'teams',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
+      },
+      home_team_goals: {
+        type: Sequelize.INTEGER,
+        allowNull: false
+      },
+      away_team: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'teams',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
+      },
+      away_team_goals: {
+        type: Sequelize.INTEGER,
+        allowNull: false
+      },
+      in_progress: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false
+      }
+    })
+  },
+
+  down: async (queryInterface, Sequelize) => {
+    await queryInterface.dropTable('matches');
+  }
+};
